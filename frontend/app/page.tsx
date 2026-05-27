@@ -1,36 +1,47 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import BetSlip from "../components/BetSlip";
+
+type Match = {
+  id: number;
+  home_team: string;
+  away_team: string;
+  match_date: string;
+};
+
+type Odds = {
+  match_id: number;
+  home_odds: number;
+  draw_odds: number;
+  away_odds: number;
+};
+
 export default function Home() {
-  const matches = [
-    {
-      id: 1,
-      homeTeam: "Real Madrid",
-      awayTeam: "Manchester City",
-      date: "June 1, 2026",
-      homeOdds: 2.1,
-      drawOdds: 3.4,
-      awayOdds: 2.8,
-    },
-    {
-      id: 2,
-      homeTeam: "Bayern Munich",
-      awayTeam: "PSG",
-      date: "June 2, 2026",
-      homeOdds: 1.95,
-      drawOdds: 3.2,
-      awayOdds: 3.1,
-    },
-  ];
+  const [matches, setMatches] = useState<Match[]>([]);
+  const [odds, setOdds] = useState<Odds[]>([]);
+  const [selection, setSelection] = useState<string | null>(null);
+  const [wallet] = useState<number>(5000);
+
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/matches")
+      .then((res) => res.json())
+      .then((data) => setMatches(data));
+
+    fetch("http://127.0.0.1:8000/odds")
+      .then((res) => res.json())
+      .then((data) => setOdds(data));
+  }, []);
 
   return (
     <main className="min-h-screen bg-slate-950 px-6 py-10 text-white">
-      <section className="mx-auto max-w-5xl">
+      <section className="mx-auto max-w-6xl">
         <div className="mb-10 rounded-2xl bg-slate-900 p-8 shadow-lg">
           <p className="mb-2 text-sm font-bold uppercase tracking-widest text-emerald-400">
             UEFA Champions League Betting
           </p>
 
-          <h1 className="text-5xl font-extrabold tracking-tight">
-            Betz
-          </h1>
+          <h1 className="text-5xl font-extrabold tracking-tight">Betz</h1>
 
           <p className="mt-4 max-w-2xl text-lg font-semibold text-slate-300">
             View UCL matchups, compare simulated odds, and build your bet slip
@@ -38,49 +49,94 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="grid gap-6">
-          {matches.map((match) => (
-            <div
-              key={match.id}
-              className="rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-lg"
-            >
-              <div className="mb-5 flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-bold uppercase tracking-wide text-emerald-400">
-                    Match #{match.id}
-                  </p>
+        <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
+          <div className="grid gap-6">
+            {matches.map((match) => {
+              const matchOdds = odds.find((o) => o.match_id === match.id);
 
-                  <h2 className="mt-2 text-3xl font-extrabold">
-                    {match.homeTeam} vs {match.awayTeam}
-                  </h2>
+              return (
+                <div
+                  key={match.id}
+                  className="rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-lg"
+                >
+                  <div className="mb-5 flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-bold uppercase tracking-wide text-emerald-400">
+                        Match #{match.id}
+                      </p>
+
+                      <h2 className="mt-2 text-3xl font-extrabold">
+                        {match.home_team} vs {match.away_team}
+                      </h2>
+                    </div>
+
+                    <p className="rounded-full bg-slate-800 px-4 py-2 text-sm font-bold text-slate-200">
+                      {match.match_date}
+                    </p>
+                  </div>
+
+                  {matchOdds && (
+                    <div className="grid gap-4 md:grid-cols-3">
+                      <button
+                        onClick={() =>
+                          setSelection(
+                            `${match.home_team} to Win (${matchOdds.home_odds})`
+                          )
+                        }
+                        className="rounded-xl bg-emerald-500 px-5 py-4 text-left font-extrabold text-slate-950 hover:bg-emerald-400"
+                      >
+                        <span className="block text-sm uppercase">
+                          Home Win
+                        </span>
+                        <span className="block text-xl">
+                          {match.home_team}
+                        </span>
+                        <span className="block text-2xl">
+                          {matchOdds.home_odds}
+                        </span>
+                      </button>
+
+                      <button
+                        onClick={() =>
+                          setSelection(`Draw (${matchOdds.draw_odds})`)
+                        }
+                        className="rounded-xl bg-slate-700 px-5 py-4 text-left font-extrabold text-white hover:bg-slate-600"
+                      >
+                        <span className="block text-sm uppercase">Draw</span>
+                        <span className="block text-xl">Tie Game</span>
+                        <span className="block text-2xl">
+                          {matchOdds.draw_odds}
+                        </span>
+                      </button>
+
+                      <button
+                        onClick={() =>
+                          setSelection(
+                            `${match.away_team} to Win (${matchOdds.away_odds})`
+                          )
+                        }
+                        className="rounded-xl bg-indigo-500 px-5 py-4 text-left font-extrabold text-white hover:bg-indigo-400"
+                      >
+                        <span className="block text-sm uppercase">
+                          Away Win
+                        </span>
+                        <span className="block text-xl">
+                          {match.away_team}
+                        </span>
+                        <span className="block text-2xl">
+                          {matchOdds.away_odds}
+                        </span>
+                      </button>
+                    </div>
+                  )}
                 </div>
+              );
+            })}
+          </div>
 
-                <p className="rounded-full bg-slate-800 px-4 py-2 text-sm font-bold text-slate-200">
-                  {match.date}
-                </p>
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-3">
-                <button className="rounded-xl bg-emerald-500 px-5 py-4 text-left font-extrabold text-slate-950 hover:bg-emerald-400">
-                  <span className="block text-sm uppercase">Home Win</span>
-                  <span className="block text-xl">{match.homeTeam}</span>
-                  <span className="block text-2xl">{match.homeOdds}</span>
-                </button>
-
-                <button className="rounded-xl bg-slate-700 px-5 py-4 text-left font-extrabold text-white hover:bg-slate-600">
-                  <span className="block text-sm uppercase">Draw</span>
-                  <span className="block text-xl">Tie Game</span>
-                  <span className="block text-2xl">{match.drawOdds}</span>
-                </button>
-
-                <button className="rounded-xl bg-indigo-500 px-5 py-4 text-left font-extrabold text-white hover:bg-indigo-400">
-                  <span className="block text-sm uppercase">Away Win</span>
-                  <span className="block text-xl">{match.awayTeam}</span>
-                  <span className="block text-2xl">{match.awayOdds}</span>
-                </button>
-              </div>
-            </div>
-          ))}
+          <div>
+            <BetSlip selection={selection} wallet={wallet} />
+          </div>
         </div>
       </section>
     </main>
