@@ -21,7 +21,8 @@ export default function Home() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [odds, setOdds] = useState<Odds[]>([]);
   const [selection, setSelection] = useState<string | null>(null);
-  const [wallet] = useState<number>(5000);
+  const [wallet, setWallet] = useState<number>(5000);
+  const [betHistory, setBetHistory] = useState<string[]>([]);
 
   useEffect(() => {
     fetch("http://127.0.0.1:8000/matches")
@@ -32,6 +33,23 @@ export default function Home() {
       .then((res) => res.json())
       .then((data) => setOdds(data));
   }, []);
+
+  const placeBet = (amount: number) => {
+    if (!selection) return;
+
+    if (amount <= 0) {
+      alert("Enter a valid wager amount");
+      return;
+    }
+
+    if (amount > wallet) {
+      alert("Insufficient wallet balance");
+      return;
+    }
+
+    setWallet(wallet - amount);
+    setBetHistory([`${selection} - $${amount}`, ...betHistory]);
+  };
 
   return (
     <main className="min-h-screen bg-slate-950 px-6 py-10 text-white">
@@ -59,7 +77,7 @@ export default function Home() {
                   key={match.id}
                   className="rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-lg"
                 >
-                  <div className="mb-5 flex items-center justify-between">
+                  <div className="mb-5 flex items-center justify-between gap-4">
                     <div>
                       <p className="text-sm font-bold uppercase tracking-wide text-emerald-400">
                         Match #{match.id}
@@ -88,9 +106,7 @@ export default function Home() {
                         <span className="block text-sm uppercase">
                           Home Win
                         </span>
-                        <span className="block text-xl">
-                          {match.home_team}
-                        </span>
+                        <span className="block text-xl">{match.home_team}</span>
                         <span className="block text-2xl">
                           {matchOdds.home_odds}
                         </span>
@@ -120,9 +136,7 @@ export default function Home() {
                         <span className="block text-sm uppercase">
                           Away Win
                         </span>
-                        <span className="block text-xl">
-                          {match.away_team}
-                        </span>
+                        <span className="block text-xl">{match.away_team}</span>
                         <span className="block text-2xl">
                           {matchOdds.away_odds}
                         </span>
@@ -135,7 +149,26 @@ export default function Home() {
           </div>
 
           <div>
-            <BetSlip selection={selection} wallet={wallet} />
+            <BetSlip selection={selection} wallet={wallet} placeBet={placeBet} />
+
+            <div className="mt-6 rounded-2xl bg-slate-900 p-6 shadow-lg">
+              <h2 className="mb-4 text-2xl font-extrabold">Bet History</h2>
+
+              <div className="space-y-3">
+                {betHistory.length === 0 ? (
+                  <p className="text-slate-400">No bets placed yet.</p>
+                ) : (
+                  betHistory.map((bet, index) => (
+                    <div
+                      key={index}
+                      className="rounded-lg bg-slate-800 p-3 font-bold"
+                    >
+                      {bet}
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </section>
