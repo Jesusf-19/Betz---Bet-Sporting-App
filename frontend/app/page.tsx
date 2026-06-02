@@ -22,12 +22,20 @@ type Selection = {
   odds: number;
 };
 
+type BetTicket = {
+  id: number;
+  selection: string;
+  odds: number;
+  wager: number;
+  potentialWin: number;
+};
+
 export default function Home() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [odds, setOdds] = useState<Odds[]>([]);
   const [selection, setSelection] = useState<Selection | null>(null);
   const [wallet, setWallet] = useState<number>(5000);
-  const [betHistory, setBetHistory] = useState<string[]>([]);
+  const [betHistory, setBetHistory] = useState<BetTicket[]>([]);
 
   useEffect(() => {
     fetch("http://127.0.0.1:8000/matches")
@@ -52,13 +60,16 @@ export default function Home() {
       return;
     }
 
+    const ticket: BetTicket = {
+      id: Date.now(),
+      selection: selection.label,
+      odds: selection.odds,
+      wager: amount,
+      potentialWin: amount * selection.odds,
+    };
+
     setWallet(wallet - amount);
-    setBetHistory([
-      `${selection.label} (${selection.odds}) - $${amount} | Potential Win: $${(
-        amount * selection.odds
-      ).toFixed(2)}`,
-      ...betHistory,
-    ]);
+    setBetHistory([ticket, ...betHistory]);
   };
 
   return (
@@ -181,16 +192,49 @@ export default function Home() {
             <div className="mt-6 rounded-2xl bg-slate-900 p-6 shadow-lg">
               <h2 className="mb-4 text-2xl font-extrabold">Bet History</h2>
 
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {betHistory.length === 0 ? (
                   <p className="text-slate-400">No bets placed yet.</p>
                 ) : (
-                  betHistory.map((bet, index) => (
+                  betHistory.map((bet) => (
                     <div
-                      key={index}
-                      className="rounded-lg bg-slate-800 p-3 font-bold"
+                      key={bet.id}
+                      className="rounded-xl border border-slate-700 bg-slate-800 p-4"
                     >
-                      {bet}
+                      <p className="text-xs font-bold uppercase tracking-widest text-emerald-400">
+                        Bet Ticket
+                      </p>
+
+                      <p className="mt-2 text-lg font-extrabold text-white">
+                        {bet.selection}
+                      </p>
+
+                      <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                        <div>
+                          <p className="font-bold uppercase text-slate-400">
+                            Odds
+                          </p>
+                          <p className="text-lg font-extrabold">{bet.odds}</p>
+                        </div>
+
+                        <div>
+                          <p className="font-bold uppercase text-slate-400">
+                            Wager
+                          </p>
+                          <p className="text-lg font-extrabold">
+                            ${bet.wager.toFixed(2)}
+                          </p>
+                        </div>
+
+                        <div className="col-span-2 rounded-lg bg-slate-900 p-3">
+                          <p className="font-bold uppercase text-emerald-400">
+                            Potential Win
+                          </p>
+                          <p className="text-2xl font-extrabold">
+                            ${bet.potentialWin.toFixed(2)}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   ))
                 )}
