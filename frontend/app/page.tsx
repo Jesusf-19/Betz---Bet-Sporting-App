@@ -17,15 +17,14 @@ type Odds = {
   away_odds: number;
 };
 
+type Selection = {
+  label: string;
+  odds: number;
+};
+
 export default function Home() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [odds, setOdds] = useState<Odds[]>([]);
-
-  type Selection = {
-  label: string;
-  odds: number;
-  };
-
   const [selection, setSelection] = useState<Selection | null>(null);
   const [wallet, setWallet] = useState<number>(5000);
   const [betHistory, setBetHistory] = useState<string[]>([]);
@@ -113,7 +112,11 @@ export default function Home() {
                             odds: matchOdds.home_odds,
                           })
                         }
-                        className="rounded-xl bg-emerald-500 px-5 py-4 text-left font-extrabold text-slate-950 hover:bg-emerald-400"
+                        className={`rounded-xl px-5 py-4 text-left font-extrabold hover:bg-emerald-400 ${
+                          selection?.label === `${match.home_team} to Win`
+                            ? "bg-yellow-400 text-slate-950 ring-4 ring-yellow-200"
+                            : "bg-emerald-500 text-slate-950"
+                        }`}
                       >
                         <span className="block text-sm uppercase">
                           Home Win
@@ -131,7 +134,11 @@ export default function Home() {
                             odds: matchOdds.draw_odds,
                           })
                         }
-                        className="rounded-xl bg-slate-700 px-5 py-4 text-left font-extrabold text-white hover:bg-slate-600"
+                        className={`rounded-xl px-5 py-4 text-left font-extrabold hover:bg-slate-600 ${
+                          selection?.label === "Draw"
+                            ? "bg-yellow-400 text-slate-950 ring-4 ring-yellow-200"
+                            : "bg-slate-700 text-white"
+                        }`}
                       >
                         <span className="block text-sm uppercase">Draw</span>
                         <span className="block text-xl">Tie Game</span>
@@ -147,7 +154,11 @@ export default function Home() {
                             odds: matchOdds.away_odds,
                           })
                         }
-                        className="rounded-xl bg-indigo-500 px-5 py-4 text-left font-extrabold text-white hover:bg-indigo-400"
+                        className={`rounded-xl px-5 py-4 text-left font-extrabold hover:bg-indigo-400 ${
+                          selection?.label === `${match.away_team} to Win`
+                            ? "bg-yellow-400 text-slate-950 ring-4 ring-yellow-200"
+                            : "bg-indigo-500 text-white"
+                        }`}
                       >
                         <span className="block text-sm uppercase">
                           Away Win
