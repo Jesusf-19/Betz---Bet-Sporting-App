@@ -20,7 +20,13 @@ type Odds = {
 export default function Home() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [odds, setOdds] = useState<Odds[]>([]);
-  const [selection, setSelection] = useState<string | null>(null);
+
+  type Selection = {
+  label: string;
+  odds: number;
+  };
+
+  const [selection, setSelection] = useState<Selection | null>(null);
   const [wallet, setWallet] = useState<number>(5000);
   const [betHistory, setBetHistory] = useState<string[]>([]);
 
@@ -48,7 +54,12 @@ export default function Home() {
     }
 
     setWallet(wallet - amount);
-    setBetHistory([`${selection} - $${amount}`, ...betHistory]);
+    setBetHistory([
+      `${selection.label} (${selection.odds}) - $${amount} | Potential Win: $${(
+        amount * selection.odds
+      ).toFixed(2)}`,
+      ...betHistory,
+    ]);
   };
 
   return (
@@ -97,9 +108,10 @@ export default function Home() {
                     <div className="grid gap-4 md:grid-cols-3">
                       <button
                         onClick={() =>
-                          setSelection(
-                            `${match.home_team} to Win (${matchOdds.home_odds})`
-                          )
+                          setSelection({
+                            label: `${match.home_team} to Win`,
+                            odds: matchOdds.home_odds,
+                          })
                         }
                         className="rounded-xl bg-emerald-500 px-5 py-4 text-left font-extrabold text-slate-950 hover:bg-emerald-400"
                       >
@@ -114,7 +126,10 @@ export default function Home() {
 
                       <button
                         onClick={() =>
-                          setSelection(`Draw (${matchOdds.draw_odds})`)
+                          setSelection({
+                            label: "Draw",
+                            odds: matchOdds.draw_odds,
+                          })
                         }
                         className="rounded-xl bg-slate-700 px-5 py-4 text-left font-extrabold text-white hover:bg-slate-600"
                       >
@@ -127,9 +142,10 @@ export default function Home() {
 
                       <button
                         onClick={() =>
-                          setSelection(
-                            `${match.away_team} to Win (${matchOdds.away_odds})`
-                          )
+                          setSelection({
+                            label: `${match.away_team} to Win`,
+                            odds: matchOdds.away_odds,
+                          })
                         }
                         className="rounded-xl bg-indigo-500 px-5 py-4 text-left font-extrabold text-white hover:bg-indigo-400"
                       >

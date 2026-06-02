@@ -2,8 +2,13 @@
 
 import { useState } from "react";
 
+type Selection = {
+  label: string;
+  odds: number;
+};
+
 type BetSlipProps = {
-  selection: string | null;
+  selection: Selection | null;
   wallet: number;
   placeBet: (amount: number) => void;
 };
@@ -15,19 +20,27 @@ export default function BetSlip({
 }: BetSlipProps) {
   const [amount, setAmount] = useState("");
 
+  const wagerAmount = Number(amount);
+  const potentialWin =
+    selection && wagerAmount > 0 ? wagerAmount * selection.odds : 0;
+
   return (
     <div className="rounded-2xl bg-slate-900 p-6 shadow-lg">
-      <h2 className="mb-4 text-2xl font-extrabold">
-        Bet Slip
-      </h2>
+      <h2 className="mb-4 text-2xl font-extrabold">Bet Slip</h2>
 
       <div className="mb-6">
         <p className="text-sm font-bold uppercase text-emerald-400">
           Current Selection
         </p>
-
         <p className="mt-2 text-lg font-bold text-white">
-          {selection || "No bet selected"}
+          {selection ? selection.label : "No bet selected"}
+        </p>
+      </div>
+
+      <div className="mb-6">
+        <p className="text-sm font-bold uppercase text-emerald-400">Odds</p>
+        <p className="mt-2 text-2xl font-extrabold text-white">
+          {selection ? selection.odds : "--"}
         </p>
       </div>
 
@@ -35,10 +48,7 @@ export default function BetSlip({
         <p className="text-sm font-bold uppercase text-emerald-400">
           Wallet Balance
         </p>
-
-        <p className="mt-2 text-3xl font-extrabold text-white">
-          ${wallet}
-        </p>
+        <p className="mt-2 text-3xl font-extrabold text-white">${wallet}</p>
       </div>
 
       <div className="mb-4">
@@ -54,6 +64,15 @@ export default function BetSlip({
           placeholder="Enter wager"
           className="w-full rounded-lg bg-slate-800 p-3 text-white outline-none"
         />
+      </div>
+
+      <div className="mb-4 rounded-lg bg-slate-800 p-4">
+        <p className="text-sm font-bold uppercase text-emerald-400">
+          Potential Win
+        </p>
+        <p className="mt-1 text-2xl font-extrabold text-white">
+          ${potentialWin.toFixed(2)}
+        </p>
       </div>
 
       <button
