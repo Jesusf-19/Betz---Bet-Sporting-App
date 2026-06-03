@@ -45,7 +45,26 @@ export default function Home() {
     fetch("http://127.0.0.1:8000/odds")
       .then((res) => res.json())
       .then((data) => setOdds(data));
+
+    const savedWallet = localStorage.getItem("betz_wallet");
+    const savedBetHistory = localStorage.getItem("betz_bet_history");
+
+    if (savedWallet) {
+      setWallet(Number(savedWallet));
+    }
+
+    if (savedBetHistory) {
+      setBetHistory(JSON.parse(savedBetHistory));
+    }
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem("betz_wallet", wallet.toString());
+  }, [wallet]);
+
+  useEffect(() => {
+    localStorage.setItem("betz_bet_history", JSON.stringify(betHistory));
+  }, [betHistory]);
 
   const placeBet = (amount: number) => {
     if (!selection) return;
@@ -82,7 +101,7 @@ export default function Home() {
 
           <h1 className="text-5xl font-extrabold tracking-tight">Betz</h1>
 
-          <p className="mt-4 max-w-2xl text-lg font-semibold text-slate-300">
+          <p className="mt-4 max-w-2xl font-semibold text-slate-300">
             View UCL matchups, compare simulated odds, and build your bet slip
             using in-app currency.
           </p>
