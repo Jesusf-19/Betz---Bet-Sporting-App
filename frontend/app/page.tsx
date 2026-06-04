@@ -91,6 +91,13 @@ export default function Home() {
     setBetHistory([ticket, ...betHistory]);
   };
 
+  const resetWallet = () => {
+  setWallet(5000);
+  setBetHistory([]);
+  localStorage.removeItem("betz_wallet");
+  localStorage.removeItem("betz_bet_history");
+  };
+
   return (
     <main className="min-h-screen bg-slate-950 px-6 py-10 text-white">
       <section className="mx-auto max-w-6xl">
@@ -206,7 +213,7 @@ export default function Home() {
           </div>
 
           <div>
-            <BetSlip selection={selection} wallet={wallet} placeBet={placeBet} />
+            <BetSlip selection={selection} wallet={wallet} placeBet={placeBet}  resetWallet={resetWallet} />
 
             <div className="mt-6 rounded-2xl bg-slate-900 p-6 shadow-lg">
               <h2 className="mb-4 text-2xl font-extrabold">Bet History</h2>
