@@ -290,9 +290,16 @@ export default function Home() {
                       className="rounded-xl border border-slate-700 bg-slate-800 p-4"
                     >
                       <div className="flex items-center justify-between gap-3">
-                        <p className="text-xs font-bold uppercase tracking-widest text-emerald-400">
-                          Bet Ticket
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-xs font-bold uppercase tracking-widest text-emerald-400">
+                            {bet.selections.length > 1 ? "Parlay Ticket" : "Single Bet"}
+                          </p>
+
+                          <span className="rounded-full bg-slate-700 px-2 py-1 text-xs font-bold">
+                            {bet.selections.length} Pick
+                            {bet.selections.length > 1 ? "s" : ""}
+                          </span>
+                        </div>
 
                         <span
                           className={`rounded-full px-3 py-1 text-xs font-extrabold uppercase ${
@@ -321,7 +328,9 @@ export default function Home() {
                       <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
                         <div>
                           <p className="font-bold uppercase text-slate-400">
-                            Combined Odds
+                            {bet.selections.length > 1
+                              ? "Combined Odds"
+                              : "Odds"}
                           </p>
                           <p className="text-lg font-extrabold">
                             {bet.odds.toFixed(2)}
