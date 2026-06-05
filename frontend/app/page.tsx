@@ -22,12 +22,15 @@ type Selection = {
   odds: number;
 };
 
+type BetStatus = "Pending" | "Won" | "Lost";
+
 type BetTicket = {
   id: number;
   selection: string;
   odds: number;
   wager: number;
   potentialWin: number;
+  status: BetStatus;
 };
 
 export default function Home() {
@@ -85,6 +88,7 @@ export default function Home() {
       odds: selection.odds,
       wager: amount,
       potentialWin: amount * selection.odds,
+      status: "Pending",
     };
 
     setWallet(wallet - amount);
@@ -92,10 +96,29 @@ export default function Home() {
   };
 
   const resetWallet = () => {
-  setWallet(5000);
-  setBetHistory([]);
-  localStorage.removeItem("betz_wallet");
-  localStorage.removeItem("betz_bet_history");
+    setWallet(5000);
+    setBetHistory([]);
+    localStorage.removeItem("betz_wallet");
+    localStorage.removeItem("betz_bet_history");
+  };
+
+  const updateBetStatus = (ticketId: number, status: BetStatus) => {
+    setBetHistory((currentHistory) =>
+      currentHistory.map((ticket) => {
+        if (ticket.id !== ticketId || ticket.status !== "Pending") {
+          return ticket;
+        }
+
+        if (status === "Won") {
+          setWallet((currentWallet) => currentWallet + ticket.potentialWin);
+        }
+
+        return {
+          ...ticket,
+          status,
+        };
+      })
+    );
   };
 
   return (
@@ -213,7 +236,12 @@ export default function Home() {
           </div>
 
           <div>
-            <BetSlip selection={selection} wallet={wallet} placeBet={placeBet}  resetWallet={resetWallet} />
+            <BetSlip
+              selection={selection}
+              wallet={wallet}
+              placeBet={placeBet}
+              resetWallet={resetWallet}
+            />
 
             <div className="mt-6 rounded-2xl bg-slate-900 p-6 shadow-lg">
               <h2 className="mb-4 text-2xl font-extrabold">Bet History</h2>
@@ -227,9 +255,23 @@ export default function Home() {
                       key={bet.id}
                       className="rounded-xl border border-slate-700 bg-slate-800 p-4"
                     >
-                      <p className="text-xs font-bold uppercase tracking-widest text-emerald-400">
-                        Bet Ticket
-                      </p>
+                      <div className="flex items-center justify-between gap-3">
+                        <p className="text-xs font-bold uppercase tracking-widest text-emerald-400">
+                          Bet Ticket
+                        </p>
+
+                        <span
+                          className={`rounded-full px-3 py-1 text-xs font-extrabold uppercase ${
+                            bet.status === "Won"
+                              ? "bg-emerald-500 text-slate-950"
+                              : bet.status === "Lost"
+                              ? "bg-red-500 text-white"
+                              : "bg-yellow-400 text-slate-950"
+                          }`}
+                        >
+                          {bet.status}
+                        </span>
+                      </div>
 
                       <p className="mt-2 text-lg font-extrabold text-white">
                         {bet.selection}
@@ -261,6 +303,24 @@ export default function Home() {
                           </p>
                         </div>
                       </div>
+
+                      {bet.status === "Pending" && (
+                        <div className="mt-4 grid grid-cols-2 gap-3">
+                          <button
+                            onClick={() => updateBetStatus(bet.id, "Won")}
+                            className="rounded-lg bg-emerald-500 py-2 font-extrabold text-slate-950 hover:bg-emerald-400"
+                          >
+                            Mark Won
+                          </button>
+
+                          <button
+                            onClick={() => updateBetStatus(bet.id, "Lost")}
+                            className="rounded-lg bg-red-500 py-2 font-extrabold text-white hover:bg-red-400"
+                          >
+                            Mark Lost
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ))
                 )}
