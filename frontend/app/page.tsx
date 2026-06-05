@@ -78,7 +78,13 @@ export default function Home() {
       return;
     }
 
-    setSelections([...selections, selection]);
+    const matchId = selection.id.split("-")[0];
+
+    const selectionsFromOtherMatches = selections.filter(
+      (item) => item.id.split("-")[0] !== matchId
+    );
+
+    setSelections([...selectionsFromOtherMatches, selection]);
   };
 
   const removeSelection = (selectionId: string) => {
