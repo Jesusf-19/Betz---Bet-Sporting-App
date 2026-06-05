@@ -88,7 +88,7 @@ export default function BetSlip({
         <p className="text-sm font-bold uppercase text-emerald-400">
           Wallet Balance
         </p>
-        <p className="mt-2 text-3xl font-extrabold text-white">${wallet}</p>
+        <p className="mt-2 text-3xl font-extrabold text-white">${wallet.toFixed(2)}</p>
       </div>
 
       <div className="mb-4">

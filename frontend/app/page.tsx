@@ -117,7 +117,7 @@ export default function Home() {
       status: "Pending",
     };
 
-    setWallet(wallet - amount);
+    setWallet(Number((wallet - amount).toFixed(2)));
     setBetHistory([ticket, ...betHistory]);
     setSelections([]);
   };
@@ -138,7 +138,9 @@ export default function Home() {
         }
 
         if (status === "Won") {
-          setWallet((currentWallet) => currentWallet + ticket.potentialWin);
+          setWallet((currentWallet) =>
+            Number((currentWallet + ticket.potentialWin).toFixed(2))
+          );
         }
 
         return {
