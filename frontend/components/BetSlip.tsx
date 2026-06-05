@@ -2,29 +2,37 @@
 
 import { useState } from "react";
 
-type Selection = {
+type BetSelection = {
+  id: string;
   label: string;
   odds: number;
 };
 
 type BetSlipProps = {
-  selection: Selection | null;
+  selections: BetSelection[];
   wallet: number;
   placeBet: (amount: number) => void;
   resetWallet: () => void;
+  removeSelection: (selectionId: string) => void;
 };
 
 export default function BetSlip({
-  selection,
+  selections,
   wallet,
   placeBet,
   resetWallet,
+  removeSelection,
 }: BetSlipProps) {
   const [amount, setAmount] = useState("");
 
   const wagerAmount = Number(amount);
+  const combinedOdds = selections.reduce(
+    (total, selection) => total * selection.odds,
+    1
+  );
+
   const potentialWin =
-    selection && wagerAmount > 0 ? wagerAmount * selection.odds : 0;
+    selections.length > 0 && wagerAmount > 0 ? wagerAmount * combinedOdds : 0;
 
   return (
     <div className="rounded-2xl bg-slate-900 p-6 shadow-lg">
@@ -32,17 +40,47 @@ export default function BetSlip({
 
       <div className="mb-6">
         <p className="text-sm font-bold uppercase text-emerald-400">
-          Current Selection
+          Current Selections
         </p>
-        <p className="mt-2 text-lg font-bold text-white">
-          {selection ? selection.label : "No bet selected"}
-        </p>
+
+        {selections.length === 0 ? (
+          <p className="mt-2 text-lg font-bold text-white">No bets selected</p>
+        ) : (
+          <div className="mt-3 space-y-3">
+            {selections.map((selection) => (
+              <div
+                key={selection.id}
+                className="rounded-lg bg-slate-800 p-3"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-extrabold text-white">
+                      {selection.label}
+                    </p>
+                    <p className="text-sm font-bold text-emerald-400">
+                      Odds: {selection.odds}
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() => removeSelection(selection.id)}
+                    className="rounded-md bg-red-500 px-2 py-1 text-xs font-extrabold text-white hover:bg-red-400"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="mb-6">
-        <p className="text-sm font-bold uppercase text-emerald-400">Odds</p>
+        <p className="text-sm font-bold uppercase text-emerald-400">
+          Combined Odds
+        </p>
         <p className="mt-2 text-2xl font-extrabold text-white">
-          {selection ? selection.odds : "--"}
+          {selections.length > 0 ? combinedOdds.toFixed(2) : "--"}
         </p>
       </div>
 
@@ -78,7 +116,7 @@ export default function BetSlip({
       </div>
 
       <button
-        disabled={!selection}
+        disabled={selections.length === 0}
         onClick={() => {
           placeBet(Number(amount));
           setAmount("");

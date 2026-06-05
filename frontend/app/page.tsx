@@ -17,7 +17,8 @@ type Odds = {
   away_odds: number;
 };
 
-type Selection = {
+type BetSelection = {
+  id: string;
   label: string;
   odds: number;
 };
@@ -26,7 +27,7 @@ type BetStatus = "Pending" | "Won" | "Lost";
 
 type BetTicket = {
   id: number;
-  selection: string;
+  selections: BetSelection[];
   odds: number;
   wager: number;
   potentialWin: number;
@@ -36,7 +37,7 @@ type BetTicket = {
 export default function Home() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [odds, setOdds] = useState<Odds[]>([]);
-  const [selection, setSelection] = useState<Selection | null>(null);
+  const [selections, setSelections] = useState<BetSelection[]>([]);
   const [wallet, setWallet] = useState<number>(5000);
   const [betHistory, setBetHistory] = useState<BetTicket[]>([]);
 
@@ -69,8 +70,31 @@ export default function Home() {
     localStorage.setItem("betz_bet_history", JSON.stringify(betHistory));
   }, [betHistory]);
 
+  const toggleSelection = (selection: BetSelection) => {
+    const alreadySelected = selections.some((item) => item.id === selection.id);
+
+    if (alreadySelected) {
+      setSelections(selections.filter((item) => item.id !== selection.id));
+      return;
+    }
+
+    setSelections([...selections, selection]);
+  };
+
+  const removeSelection = (selectionId: string) => {
+    setSelections(selections.filter((selection) => selection.id !== selectionId));
+  };
+
+  const isSelected = (selectionId: string) => {
+    return selections.some((selection) => selection.id === selectionId);
+  };
+
+  const getCombinedOdds = () => {
+    return selections.reduce((total, selection) => total * selection.odds, 1);
+  };
+
   const placeBet = (amount: number) => {
-    if (!selection) return;
+    if (selections.length === 0) return;
 
     if (amount <= 0) {
       alert("Enter a valid wager amount");
@@ -82,22 +106,26 @@ export default function Home() {
       return;
     }
 
+    const combinedOdds = getCombinedOdds();
+
     const ticket: BetTicket = {
       id: Date.now(),
-      selection: selection.label,
-      odds: selection.odds,
+      selections,
+      odds: combinedOdds,
       wager: amount,
-      potentialWin: amount * selection.odds,
+      potentialWin: amount * combinedOdds,
       status: "Pending",
     };
 
     setWallet(wallet - amount);
     setBetHistory([ticket, ...betHistory]);
+    setSelections([]);
   };
 
   const resetWallet = () => {
     setWallet(5000);
     setBetHistory([]);
+    setSelections([]);
     localStorage.removeItem("betz_wallet");
     localStorage.removeItem("betz_bet_history");
   };
@@ -142,6 +170,24 @@ export default function Home() {
             {matches.map((match) => {
               const matchOdds = odds.find((o) => o.match_id === match.id);
 
+              const homeSelection = {
+                id: `${match.id}-home`,
+                label: `${match.home_team} to Win`,
+                odds: matchOdds?.home_odds ?? 0,
+              };
+
+              const drawSelection = {
+                id: `${match.id}-draw`,
+                label: `${match.home_team} vs ${match.away_team} Draw`,
+                odds: matchOdds?.draw_odds ?? 0,
+              };
+
+              const awaySelection = {
+                id: `${match.id}-away`,
+                label: `${match.away_team} to Win`,
+                odds: matchOdds?.away_odds ?? 0,
+              };
+
               return (
                 <div
                   key={match.id}
@@ -166,14 +212,9 @@ export default function Home() {
                   {matchOdds && (
                     <div className="grid gap-4 md:grid-cols-3">
                       <button
-                        onClick={() =>
-                          setSelection({
-                            label: `${match.home_team} to Win`,
-                            odds: matchOdds.home_odds,
-                          })
-                        }
+                        onClick={() => toggleSelection(homeSelection)}
                         className={`rounded-xl px-5 py-4 text-left font-extrabold hover:bg-emerald-400 ${
-                          selection?.label === `${match.home_team} to Win`
+                          isSelected(homeSelection.id)
                             ? "bg-yellow-400 text-slate-950 ring-4 ring-yellow-200"
                             : "bg-emerald-500 text-slate-950"
                         }`}
@@ -188,14 +229,9 @@ export default function Home() {
                       </button>
 
                       <button
-                        onClick={() =>
-                          setSelection({
-                            label: "Draw",
-                            odds: matchOdds.draw_odds,
-                          })
-                        }
+                        onClick={() => toggleSelection(drawSelection)}
                         className={`rounded-xl px-5 py-4 text-left font-extrabold hover:bg-slate-600 ${
-                          selection?.label === "Draw"
+                          isSelected(drawSelection.id)
                             ? "bg-yellow-400 text-slate-950 ring-4 ring-yellow-200"
                             : "bg-slate-700 text-white"
                         }`}
@@ -208,14 +244,9 @@ export default function Home() {
                       </button>
 
                       <button
-                        onClick={() =>
-                          setSelection({
-                            label: `${match.away_team} to Win`,
-                            odds: matchOdds.away_odds,
-                          })
-                        }
+                        onClick={() => toggleSelection(awaySelection)}
                         className={`rounded-xl px-5 py-4 text-left font-extrabold hover:bg-indigo-400 ${
-                          selection?.label === `${match.away_team} to Win`
+                          isSelected(awaySelection.id)
                             ? "bg-yellow-400 text-slate-950 ring-4 ring-yellow-200"
                             : "bg-indigo-500 text-white"
                         }`}
@@ -237,10 +268,11 @@ export default function Home() {
 
           <div>
             <BetSlip
-              selection={selection}
+              selections={selections}
               wallet={wallet}
               placeBet={placeBet}
               resetWallet={resetWallet}
+              removeSelection={removeSelection}
             />
 
             <div className="mt-6 rounded-2xl bg-slate-900 p-6 shadow-lg">
@@ -273,16 +305,25 @@ export default function Home() {
                         </span>
                       </div>
 
-                      <p className="mt-2 text-lg font-extrabold text-white">
-                        {bet.selection}
-                      </p>
+                      <div className="mt-3 space-y-2">
+                        {(bet.selections ?? []).map((selection) => (
+                          <p
+                            key={selection.id}
+                            className="rounded-lg bg-slate-900 p-2 text-sm font-extrabold text-white"
+                          >
+                            {selection.label} ({selection.odds})
+                          </p>
+                        ))}
+                      </div>
 
                       <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
                         <div>
                           <p className="font-bold uppercase text-slate-400">
-                            Odds
+                            Combined Odds
                           </p>
-                          <p className="text-lg font-extrabold">{bet.odds}</p>
+                          <p className="text-lg font-extrabold">
+                            {bet.odds.toFixed(2)}
+                          </p>
                         </div>
 
                         <div>
