@@ -14,6 +14,7 @@ type BetSlipProps = {
   placeBet: (amount: number) => void;
   resetWallet: () => void;
   removeSelection: (selectionId: string) => void;
+  clearSelections: () => void;
 };
 
 export default function BetSlip({
@@ -22,6 +23,7 @@ export default function BetSlip({
   placeBet,
   resetWallet,
   removeSelection,
+  clearSelections,
 }: BetSlipProps) {
   const [amount, setAmount] = useState("");
 
@@ -124,6 +126,14 @@ export default function BetSlip({
         className="w-full rounded-xl bg-emerald-500 py-3 font-extrabold text-slate-950 hover:bg-emerald-400 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-400"
       >
         Place Bet
+      </button>
+      
+      <button
+        onClick={clearSelections}
+        disabled={selections.length === 0}
+        className="mt-3 w-full rounded-xl bg-slate-700 py-3 font-extrabold text-white hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-500"
+      >
+        Clear Selections
       </button>
 
       <button

@@ -91,6 +91,10 @@ export default function Home() {
     setSelections(selections.filter((selection) => selection.id !== selectionId));
   };
 
+  const clearSelections = () => {
+    setSelections([]);
+  };
+
   const isSelected = (selectionId: string) => {
     return selections.some((selection) => selection.id === selectionId);
   };
@@ -281,6 +285,7 @@ export default function Home() {
               placeBet={placeBet}
               resetWallet={resetWallet}
               removeSelection={removeSelection}
+              clearSelections={clearSelections}
             />
 
             <div className="mt-6 rounded-2xl bg-slate-900 p-6 shadow-lg">
