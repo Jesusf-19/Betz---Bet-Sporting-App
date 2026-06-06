@@ -113,4 +113,5 @@ http://localhost:3000
 
 ## Acknowledgements
 
-This project is a personal portfolio evolution of a collaborative software engineering project originally developed during CPSC 491. The application has been redesigned and expanded with additional features, architecture improvements, and portfolio-focused enhancements.
+This project is a personal portfolio evolution of a collaborative software engineering project originally developed during CPSC 491 class at CSUF. Original authors and collaborators: Elizabeth M. and Jessica F.
+The application has been redesigned and expanded with additional features, architecture improvements, and portfolio-focused enhancements.
