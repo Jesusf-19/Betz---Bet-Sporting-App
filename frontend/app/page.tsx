@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Dashboard from "../components/Dashboard";
 import LandingPage from "../components/LandingPage";
@@ -11,6 +11,19 @@ type View = "landing" | "login" | "dashboard";
 export default function Home() {
   const [view, setView] = useState<View>("landing");
 
+  useEffect(() => {
+    const savedLogin = localStorage.getItem("betz_logged_in");
+
+    if (savedLogin === "true") {
+      setView("dashboard");
+    }
+  }, []);
+
+  const handleLogin = () => {
+    localStorage.setItem("betz_logged_in", "true");
+    setView("dashboard");
+  };
+
   if (view === "dashboard") {
     return <Dashboard />;
   }
@@ -18,15 +31,11 @@ export default function Home() {
   if (view === "login") {
     return (
       <LoginForm
-        onLogin={() => setView("dashboard")}
+        onLogin={handleLogin}
         onBack={() => setView("landing")}
       />
     );
   }
 
-  return (
-    <LandingPage
-      onLoginClick={() => setView("login")}
-    />
-  );
+  return <LandingPage onLoginClick={() => setView("login")} />;
 }
