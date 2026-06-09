@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import BetSlip from "./BetSlip";
+import Navbar from "./Navbar";
 
 type Match = {
   id: number;
@@ -170,14 +171,8 @@ export default function Dashboard({
   return (
     <main className="min-h-screen bg-slate-950 px-6 py-10 text-white">
       <section className="mx-auto max-w-6xl">
-        <div className="mb-4 flex justify-end">
-          <button
-            onClick={onLogout}
-            className="rounded-xl bg-red-500 px-5 py-2 font-extrabold text-white hover:bg-red-400"
-          >
-            Logout
-          </button>
-        </div>
+        <Navbar wallet={wallet} onLogout={onLogout} />
+        
         <div className="mb-10 rounded-2xl bg-slate-900 p-8 shadow-lg">
           <p className="mb-2 text-sm font-bold uppercase tracking-widest text-emerald-400">
             UEFA Champions League Betting
