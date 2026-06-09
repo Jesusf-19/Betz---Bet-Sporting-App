@@ -1,15 +1,10 @@
-from pydantic import BaseModel
+from sqlalchemy import Column, Integer, String
+
+from .database import Base
 
 
-class Match(BaseModel):
-    id: int
-    home_team: str
-    away_team: str
-    match_date: str
+class User(Base):
+    __tablename__ = "users"
 
-
-class Odds(BaseModel):
-    match_id: int
-    home_odds: float
-    draw_odds: float
-    away_odds: float
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, nullable=False)
