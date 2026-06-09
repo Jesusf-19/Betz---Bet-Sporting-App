@@ -13,3 +13,14 @@ class Odds(BaseModel):
     home_odds: float
     draw_odds: float
     away_odds: float
+
+class UserCreate(BaseModel):
+    email: str
+
+
+class UserResponse(BaseModel):
+    id: int
+    email: str
+
+    class Config:
+        from_attributes = True
