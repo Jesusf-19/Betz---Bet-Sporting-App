@@ -172,17 +172,20 @@ export default function Dashboard({
     <main className="min-h-screen bg-slate-950 px-6 py-10 text-white">
       <section className="mx-auto max-w-6xl">
         <Navbar wallet={wallet} onLogout={onLogout} />
-        
+
         <div className="mb-10 rounded-2xl bg-slate-900 p-8 shadow-lg">
           <p className="mb-2 text-sm font-bold uppercase tracking-widest text-emerald-400">
             UEFA Champions League Betting
           </p>
 
-          <h1 className="text-5xl font-extrabold tracking-tight">Betz</h1>
+          <h1 className="text-5xl font-extrabold tracking-tight">
+            UEFA Champions League Markets
+          </h1>
 
-          <p className="mt-4 max-w-2xl font-semibold text-slate-300">
-            View UCL matchups, compare simulated odds, and build your bet slip
-            using in-app currency.
+          <p className="mt-4 max-w-3xl font-semibold text-slate-300">
+            Browse upcoming UEFA Champions League fixtures, compare betting odds,
+            create parlays, track wagers, and manage your betting portfolio
+            through the Betz platform.
           </p>
         </div>
 
