@@ -25,7 +25,14 @@ export default function Home() {
   };
 
   if (view === "dashboard") {
-    return <Dashboard />;
+    return (
+      <Dashboard
+        onLogout={() => {
+          localStorage.removeItem("betz_logged_in");
+          setView("landing");
+        }}
+      />
+    );
   }
 
   if (view === "login") {
