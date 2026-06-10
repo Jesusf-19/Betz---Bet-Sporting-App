@@ -2,12 +2,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.data import matches, odds
 from app.database import Base, engine
-from app.models import User
+from app.models import User, Wallet
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.schemas import UserCreate, UserResponse
+from app.schemas import UserCreate, UserResponse, WalletResponse
 
 app = FastAPI(title="Betz API")
 
@@ -42,6 +42,36 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 @app.get("/users", response_model=list[UserResponse])
 def get_users(db: Session = Depends(get_db)):
     return db.query(User).all()
+
+@app.get("/users/{user_id}/wallet", response_model=WalletResponse)
+def get_wallet(user_id: int, db: Session = Depends(get_db)):
+    wallet = db.query(Wallet).filter(Wallet.user_id == user_id).first()
+
+    if wallet:
+        return wallet
+
+    new_wallet = Wallet(user_id=user_id, balance=5000.0)
+    db.add(new_wallet)
+    db.commit()
+    db.refresh(new_wallet)
+
+    return new_wallet
+
+
+@app.put("/users/{user_id}/wallet", response_model=WalletResponse)
+def update_wallet(user_id: int, balance: float, db: Session = Depends(get_db)):
+    wallet = db.query(Wallet).filter(Wallet.user_id == user_id).first()
+
+    if not wallet:
+        wallet = Wallet(user_id=user_id, balance=balance)
+        db.add(wallet)
+    else:
+        wallet.balance = balance
+
+    db.commit()
+    db.refresh(wallet)
+
+    return wallet
 
 @app.get("/")
 def root():
