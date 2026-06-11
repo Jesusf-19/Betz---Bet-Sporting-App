@@ -32,3 +32,39 @@ class WalletResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class BetSelectionCreate(BaseModel):
+    id: str
+    label: str
+    odds: float
+
+
+class BetCreate(BaseModel):
+    selections: list[BetSelectionCreate]
+    odds: float
+    wager: float
+    potentialWin: float
+    status: str = "Pending"
+
+
+class BetSelectionResponse(BaseModel):
+    id: int
+    selection_id: str
+    label: str
+    odds: float
+
+    class Config:
+        from_attributes = True
+
+
+class BetResponse(BaseModel):
+    id: int
+    odds: float
+    wager: float
+    potential_win: float
+    status: str
+    user_id: int
+    selections: list[BetSelectionResponse]
+
+    class Config:
+        from_attributes = True

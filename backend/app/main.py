@@ -2,12 +2,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.data import matches, odds
 from app.database import Base, engine
-from app.models import User, Wallet
+from app.models import Bet, BetSelection, User, Wallet
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.schemas import UserCreate, UserResponse, WalletResponse
+from app.schemas import BetCreate, BetResponse, UserCreate, UserResponse, WalletResponse
 
 app = FastAPI(title="Betz API")
 
@@ -56,6 +56,57 @@ def get_wallet(user_id: int, db: Session = Depends(get_db)):
     db.refresh(new_wallet)
 
     return new_wallet
+
+@app.post("/users/{user_id}/bets", response_model=BetResponse)
+def create_bet(user_id: int, bet: BetCreate, db: Session = Depends(get_db)):
+    new_bet = Bet(
+        user_id=user_id,
+        odds=bet.odds,
+        wager=bet.wager,
+        potential_win=bet.potentialWin,
+        status=bet.status,
+    )
+
+    db.add(new_bet)
+    db.commit()
+    db.refresh(new_bet)
+
+    for selection in bet.selections:
+        new_selection = BetSelection(
+            bet_id=new_bet.id,
+            selection_id=selection.id,
+            label=selection.label,
+            odds=selection.odds,
+        )
+        db.add(new_selection)
+
+    db.commit()
+    db.refresh(new_bet)
+
+    return new_bet
+
+
+@app.get("/users/{user_id}/bets", response_model=list[BetResponse])
+def get_bets(user_id: int, db: Session = Depends(get_db)):
+    return db.query(Bet).filter(Bet.user_id == user_id).all()
+
+
+@app.put("/bets/{bet_id}/status", response_model=BetResponse)
+def update_bet_status(
+    bet_id: int,
+    status: str,
+    db: Session = Depends(get_db),
+):
+    bet = db.query(Bet).filter(Bet.id == bet_id).first()
+
+    if not bet:
+        raise Exception("bet not found")
+
+    bet.status = status
+    db.commit()
+    db.refresh(bet)
+
+    return bet
 
 
 @app.put("/users/{user_id}/wallet", response_model=WalletResponse)
