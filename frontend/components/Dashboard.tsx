@@ -48,7 +48,6 @@ export default function Dashboard({
   const [wallet, setWallet] = useState<number>(5000);
   const DEMO_USER_ID = 1;
   const [betHistory, setBetHistory] = useState<BetTicket[]>([]);
-  const [isHistoryLoaded, setIsHistoryLoaded] = useState(false);
 
   useEffect(() => {
     fetch("http://127.0.0.1:8000/matches")
@@ -63,21 +62,25 @@ export default function Dashboard({
       .then((res) => res.json())
       .then((data) => setWallet(Number(data.balance)));
 
-    const savedBetHistory = localStorage.getItem("betz_bet_history");
+    fetch(`http://127.0.0.1:8000/users/${DEMO_USER_ID}/bets`)
+    .then((res) => res.json())
+    .then((data) => {
+      const formattedBets = data.map((bet: any) => ({
+        id: bet.id,
+        selections: bet.selections.map((selection: any) => ({
+          id: selection.selection_id,
+          label: selection.label,
+          odds: selection.odds,
+        })),
+        odds: bet.odds,
+        wager: bet.wager,
+        potentialWin: bet.potential_win,
+        status: bet.status,
+      }));
 
-    
-
-    if (savedBetHistory) {
-      setBetHistory(JSON.parse(savedBetHistory));
-    }
-    setIsHistoryLoaded(true);setIsHistoryLoaded(true);
+    setBetHistory(formattedBets);
+  });
   }, []);
-
-  useEffect(() => {
-    if (isHistoryLoaded) {
-      localStorage.setItem("betz_bet_history", JSON.stringify(betHistory));
-    }
-  }, [betHistory, isHistoryLoaded]);
 
   const toggleSelection = (selection: BetSelection) => {
     const alreadySelected = selections.some((item) => item.id === selection.id);
@@ -148,19 +151,45 @@ export default function Dashboard({
     const newBalance = Number((wallet - amount).toFixed(2));
     setWallet(newBalance);
     updateWalletInDatabase(newBalance);
-    setBetHistory([ticket, ...betHistory]);
-    setSelections([]);
+    fetch(`http://127.0.0.1:8000/users/${DEMO_USER_ID}/bets`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(ticket),
+    })
+    .then((res) => res.json())
+    .then((savedBet) => {
+      const formattedBet: BetTicket = {
+        id: savedBet.id,
+        selections: savedBet.selections.map((selection: any) => ({
+          id: selection.selection_id,
+          label: selection.label,
+          odds: selection.odds,
+        })),
+        odds: savedBet.odds,
+        wager: savedBet.wager,
+        potentialWin: savedBet.potential_win,
+        status: savedBet.status,
+      };
+
+      setBetHistory([formattedBet, ...betHistory]);
+      setSelections([]);
+    });
   };
 
   const resetWallet = () => {
     setWallet(5000);
     setBetHistory([]);
     setSelections([]);
-    localStorage.removeItem("betz_bet_history");
     updateWalletInDatabase(5000);
   };
 
   const updateBetStatus = (ticketId: number, status: BetStatus) => {
+    fetch(`http://127.0.0.1:8000/bets/${ticketId}/status?status=${status}`, {
+    method: "PUT",
+    });
+    
     setBetHistory((currentHistory) =>
       currentHistory.map((ticket) => {
         if (ticket.id !== ticketId || ticket.status !== "Pending") {
