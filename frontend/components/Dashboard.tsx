@@ -50,7 +50,7 @@ export default function Dashboard({
   const [betHistory, setBetHistory] = useState<BetTicket[]>([]);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/matches")
+    fetch("http://127.0.0.1:8000/ucl/matches")
       .then((res) => res.json())
       .then((data) => setMatches(data));
 
@@ -239,7 +239,12 @@ export default function Dashboard({
         <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
           <div className="grid gap-6">
             {matches.map((match) => {
-              const matchOdds = odds.find((o) => o.match_id === match.id);
+              const matchOdds = {
+                match_id: match.id,
+                home_odds: 2.1,
+                draw_odds: 3.4,
+                away_odds: 2.8,
+              };
 
               const homeSelection = {
                 id: `${match.id}-home`,
