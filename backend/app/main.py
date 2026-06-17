@@ -6,6 +6,7 @@ from app.models import Bet, BetSelection, User, Wallet
 from fastapi import Depends
 from sqlalchemy.orm import Session
 from app.football_api import get_ucl_matches
+from app.prediction_engine import get_ucl_predictions
 
 from app.database import get_db
 from app.schemas import BetCreate, BetResponse, UserCreate, UserResponse, WalletResponse
@@ -42,6 +43,10 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 @app.get("/ucl/matches")
 def ucl_matches():
     return get_ucl_matches()
+
+@app.get("/ucl/predictions")
+def ucl_predictions():
+    return get_ucl_predictions()
 
 @app.get("/users", response_model=list[UserResponse])
 def get_users(db: Session = Depends(get_db)):
