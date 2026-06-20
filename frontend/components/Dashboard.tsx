@@ -39,11 +39,24 @@ type DashboardProps = {
   onLogout: () => void;
 };
 
+type Prediction = {
+  match_id: number;
+  home_team: string;
+  away_team: string;
+  match_date: string;
+  home_win_probability: number;
+  draw_probability: number;
+  away_win_probability: number;
+  recommended_pick: string;
+  confidence_score: number;
+};
+
 export default function Dashboard({
   onLogout,
 }: DashboardProps) {
   const [matches, setMatches] = useState<Match[]>([]);
   const [odds, setOdds] = useState<Odds[]>([]);
+  const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [selections, setSelections] = useState<BetSelection[]>([]);
   const [wallet, setWallet] = useState<number>(5000);
   const DEMO_USER_ID = 1;
@@ -52,11 +65,29 @@ export default function Dashboard({
   useEffect(() => {
     fetch("http://127.0.0.1:8000/ucl/matches")
       .then((res) => res.json())
-      .then((data) => setMatches(data));
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setMatches(data);
+        } else {
+          console.error("Unexpected matches response:", data);
+          setMatches([]);
+        }
+      });
 
     fetch("http://127.0.0.1:8000/odds")
       .then((res) => res.json())
       .then((data) => setOdds(data));
+    
+    fetch("http://127.0.0.1:8000/ucl/predictions")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setPredictions(data);
+        } else {
+          console.error("Unexpected predictions response:", data);
+          setPredictions([]);
+        }
+      });
 
     fetch(`http://127.0.0.1:8000/users/${DEMO_USER_ID}/wallet`)
       .then((res) => res.json())
@@ -173,7 +204,11 @@ export default function Dashboard({
         status: savedBet.status,
       };
 
-      setBetHistory([formattedBet, ...betHistory]);
+      setBetHistory((currentHistory) => [
+        formattedBet,
+        ...currentHistory,
+      ]);
+      
       setSelections([]);
     });
   };
@@ -264,6 +299,10 @@ export default function Dashboard({
                 odds: matchOdds?.away_odds ?? 0,
               };
 
+              const prediction = predictions.find(
+                (item) => item.match_id === match.id
+              );
+
               return (
                 <div
                   key={match.id}
@@ -284,6 +323,45 @@ export default function Dashboard({
                       {match.match_date}
                     </p>
                   </div>
+
+                  {prediction && (
+                    <div className="mb-5 rounded-xl bg-slate-800 p-4">
+                      <p className="text-sm font-bold uppercase text-emerald-400">
+                        Betz Prediction
+                      </p>
+
+                      <p className="mt-2 text-lg font-extrabold text-white">
+                        Recommended Pick: {prediction.recommended_pick}
+                      </p>
+
+                    <div className="mt-4 grid gap-3 text-sm md:grid-cols-3">
+                      <div>
+                        <p className="font-bold text-slate-400">Home Win</p>
+                        <p className="text-xl font-extrabold">
+                          {prediction.home_win_probability}%
+                        </p>
+                      </div>
+
+                    <div>
+                      <p className="font-bold text-slate-400">Draw</p>
+                      <p className="text-xl font-extrabold">
+                        {prediction.draw_probability}%
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="font-bold text-slate-400">Away Win</p>
+                      <p className="text-xl font-extrabold">
+                        {prediction.away_win_probability}%
+                      </p>
+                    </div>
+                  </div>
+
+                  <p className="mt-4 text-sm font-bold text-slate-300">
+                    Confidence Score: {prediction.confidence_score}/10
+                  </p>
+                </div>
+                )}
 
                   {matchOdds && (
                     <div className="grid gap-4 md:grid-cols-3">
