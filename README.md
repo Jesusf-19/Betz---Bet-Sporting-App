@@ -1,4 +1,4 @@
-# Betz
+# ⚽ Betz
 
 Betz is a full-stack sports betting platform focused on UEFA Champions League football. Users can browse match odds, build parlays, manage a virtual betting wallet, track betting history, and simulate wager outcomes through an interactive dashboard.
 
@@ -7,111 +7,128 @@ Betz is a full-stack sports betting platform focused on UEFA Champions League fo
 Betz was developed as a portfolio project to demonstrate full-stack software engineering skills using modern web technologies. The platform combines a FastAPI backend with a Next.js frontend and includes realistic sportsbook features such as parlays, wallet management, persistent user data, and bet tracking.
 
 ## Features
-
+### Live UEFA Champions League Fixtures
+    - Live Champions League fixtures powered by the Football-Data.org API
+    - Automatic fixture updates
+    - Interactive match cards
+### AI Betting Predictions
+    - AI prediction engine for every match
+    - Home, Draw, and Away win probabilities
+    - Recommended betting pick
+    - Confidence score for each prediction
 ### Betting Platform
-
-* Browse UEFA Champions League fixtures
-* View simulated betting odds
-* Build single bets and multi-leg parlays
-* Calculate potential winnings in real time
-* Prevent invalid selections from the same match
-
+    - Single bets
+    - Multi-leg parlays
+    - Real-time potential winnings calculation
+    - Prevention of conflicting selections from the same match
 ### Wallet Management
-
-* Virtual wallet balance tracking
-* Automatic payout calculation for winning bets
-* Wallet persistence using local storage
-* Wallet reset functionality
-
-### Bet Tracking
-
-* Interactive bet slip
-* Bet history and ticket generation
-* Pending, Won, and Lost bet statuses
-* Historical wager tracking
-
-### User Experience
-
-* Landing page experience
-* Dashboard interface
-* Responsive design
-* Real-time selection updates
-
+    - Virtual betting wallet
+    - Automatic payout calculations
+    - Persistent wallet balance stored in PostgreSQL
+    - Wallet reset functionality
+### Bet History
+    - Persistent betting history
+    - Pending, Won, and Lost bet tracking
+    - Multi-selection ticket support
+    - Historical wager storage in PostgreSQL
 ## Technology Stack
-
-### Frontend
-
-* Next.js
-* React
-* TypeScript
-* Tailwind CSS
-
+    - Frontend
+    - Next.js
+    - React
+    - TypeScript
+    - Tailwind CSS
 ### Backend
+    - FastAPI
+    - Python
+    - SQLAlchemy
+    - REST API
+### Database
+    - PostgreSQL
+    - Docker
+### External APIs
+    - Football-Data.org (UEFA Champions League fixtures)
 
-* FastAPI
-* Python
-
-### Development Tools
-
-* Git
-* GitHub
-* Vercel (planned deployment)
-
-## Project Structure
-
-```text
-frontend/
-├── app/
-├── components/
-│   ├── Dashboard.tsx
-│   ├── LandingPage.tsx
-│   └── BetSlip.tsx
-
-backend/
-├── app/
-├── tests/
-```
+## Project Architecture
+                Football-Data.org API
+                         │
+                         ▼
+                  FastAPI Backend
+         ┌───────────────┴───────────────┐
+         │                               │
+         ▼                               ▼
+ Prediction Engine                PostgreSQL Database
+         │                         ├── Users
+         │                         ├── Wallets
+         ▼                         ├── Bets
+    Betting Predictions            └── Bet Selections
+         │
+         ▼
+     Next.js Frontend
+         │
+         ▼
+ Interactive Betting Dashboard
 
 ## Running the Project
-
+### Clone the repository
+    git clone <repository-url>
+    cd Betz_Sporting_App
 ### Backend
+    cd backend
+    source .venv/bin/activate
 
-```bash
-cd backend
-source .venv/bin/activate
-uvicorn app.main:app --reload
-```
+    pip install -r requirements.txt
+
+    uvicorn app.main:app --reload
 
 Backend runs at:
 
-```text
-http://127.0.0.1:8000
-```
+    http://127.0.0.1:8000
 
 ### Frontend
+    cd frontend
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
+    npm install
+
+    npm run dev
 
 Frontend runs at:
 
-```text
-http://localhost:3000
-```
+    http://localhost:3000
 
-## Future Enhancements
+### Database
 
-* User authentication
-* PostgreSQL database integration
-* Live football data APIs
-* Additional leagues and competitions
-* User profiles and statistics
-* Cloud deployment
+Start PostgreSQL with Docker:
+
+    docker-compose up -d
+
+### Environment Variables
+
+Create a .env file inside the backend/ directory:
+
+    FOOTBALL_DATA_API_KEY=YOUR_API_KEY
+
+You can obtain a free API key from Football-Data.org.
+
+## Current Functionality
+    - Live Champions League fixtures
+    - AI match predictions
+    - Simulated betting odds
+    - Multi-leg parlays
+    - Wallet persistence
+    - Bet history persistence
+    - PostgreSQL database integration
+    - Dockerized database
+    - Landing page
+    - Login screen
+    - Interactive betting dashboard
 
 ## Acknowledgements
+This repository is a personal portfolio evolution of a collaborative software engineering project completed during CPSC 491 at California State University, Fullerton.
 
-This project is a personal portfolio evolution of a collaborative software engineering project originally developed during CPSC 491 class at CSUF. Original authors and collaborators: Elizabeth M. and Jessica F.
-The application has been redesigned and expanded with additional features, architecture improvements, and portfolio-focused enhancements.
+The original project was developed by:
+
+    - Elizabeth M.
+    - Jessica F.
+    - Jesus Fierro (this repository)
+
+This version has been independently redesigned and significantly expanded with a modern full-stack architecture, persistent PostgreSQL storage, Docker integration, live football data, and an AI-powered prediction engine.
