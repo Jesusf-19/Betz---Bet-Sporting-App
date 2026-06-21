@@ -8,69 +8,70 @@ Betz was developed as a portfolio project to demonstrate full-stack software eng
 
 ## Features
 ### Live UEFA Champions League Fixtures
-    - Live Champions League fixtures powered by the Football-Data.org API
-    - Automatic fixture updates
-    - Interactive match cards
+- Live Champions League fixtures powered by the Football-Data.org API
+- Automatic fixture updates
+- Interactive match cards
 ### AI Betting Predictions
-    - AI prediction engine for every match
-    - Home, Draw, and Away win probabilities
-    - Recommended betting pick
-    - Confidence score for each prediction
+- AI prediction engine for every match
+- Home, Draw, and Away win probabilities
+- Recommended betting pick
+- Confidence score for each prediction
 ### Betting Platform
-    - Single bets
-    - Multi-leg parlays
-    - Real-time potential winnings calculation
-    - Prevention of conflicting selections from the same match
+- Single bets
+- Multi-leg parlays
+- Real-time potential winnings calculation
+- Prevention of conflicting selections from the same match
 ### Wallet Management
-    - Virtual betting wallet
-    - Automatic payout calculations
-    - Persistent wallet balance stored in PostgreSQL
-    - Wallet reset functionality
+- Virtual betting wallet
+- Automatic payout calculations
+- Persistent wallet balance stored in PostgreSQL
+- Wallet reset functionality
 ### Bet History
-    - Persistent betting history
-    - Pending, Won, and Lost bet tracking
-    - Multi-selection ticket support
-    - Historical wager storage in PostgreSQL
+- Persistent betting history
+- Pending, Won, and Lost bet tracking
+- Multi-selection ticket support
+- Historical wager storage in PostgreSQL
 ## Technology Stack
-    - Frontend
-    - Next.js
-    - React
-    - TypeScript
-    - Tailwind CSS
+- Frontend
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
 ### Backend
-    - FastAPI
-    - Python
-    - SQLAlchemy
-    - REST API
+- FastAPI
+- Python
+- SQLAlchemy
+- REST API
 ### Database
-    - PostgreSQL
-    - Docker
+- PostgreSQL
+- Docker
 ### External APIs
-    - Football-Data.org (UEFA Champions League fixtures)
+- Football-Data.org (UEFA Champions League fixtures)
 
 ## Project Architecture
+
                 Football-Data.org API
                          │
                          ▼
                   FastAPI Backend
          ┌───────────────┴───────────────┐
          │                               │
-         ▼                               ▼
- Prediction Engine                PostgreSQL Database
-         │                         ├── Users
-         │                         ├── Wallets
-         ▼                         ├── Bets
-    Betting Predictions            └── Bet Selections
+         |                               |
+    Prediction Engine                PostgreSQL Database
+         │                              ├── Users
+         │                              ├── Wallets
+         |                              ├── Bets
+    Betting Predictions                 └── Bet Selections
          │
-         ▼
+         |
      Next.js Frontend
          │
-         ▼
- Interactive Betting Dashboard
+         |
+    Interactive Betting Dashboard
 
 ## Running the Project
 ### Clone the repository
-    git clone <repository-url>
+    git clone https://github.com/Jesusf-19/Betz---Bet-Sporting-App.git
     cd Betz_Sporting_App
 ### Backend
     cd backend
@@ -105,30 +106,30 @@ Start PostgreSQL with Docker:
 
 Create a .env file inside the backend/ directory:
 
-    FOOTBALL_DATA_API_KEY=YOUR_API_KEY
+    FOOTBALL_DATA_API_KEY=33eb6e4b0b254bb1be6279dc54491643
 
 You can obtain a free API key from Football-Data.org.
 
 ## Current Functionality
-    - Live Champions League fixtures
-    - AI match predictions
-    - Simulated betting odds
-    - Multi-leg parlays
-    - Wallet persistence
-    - Bet history persistence
-    - PostgreSQL database integration
-    - Dockerized database
-    - Landing page
-    - Login screen
-    - Interactive betting dashboard
+- Live Champions League fixtures
+- AI match predictions
+- Simulated betting odds
+- Multi-leg parlays
+- Wallet persistence
+- Bet history persistence
+- PostgreSQL database integration
+- Dockerized database
+- Landing page
+- Login screen
+- Interactive betting dashboard
 
 ## Acknowledgements
 This repository is a personal portfolio evolution of a collaborative software engineering project completed during CPSC 491 at California State University, Fullerton.
 
 The original project was developed by:
 
-    - Elizabeth M.
-    - Jessica F.
-    - Jesus Fierro (this repository)
+- Elizabeth M.
+- Jessica F.
+- Jesus Fierro (this repository)
 
 This version has been independently redesigned and significantly expanded with a modern full-stack architecture, persistent PostgreSQL storage, Docker integration, live football data, and an AI-powered prediction engine.
